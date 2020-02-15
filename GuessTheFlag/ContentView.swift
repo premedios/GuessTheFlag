@@ -15,14 +15,18 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var scoreTitle = ""
     
+    @State private var currentScore = 0
+    
     var body: some View {
         ZStack {
             LinearGradient(gradient: Gradient(colors: [.blue, .black]), startPoint: .top, endPoint: .bottom)
             .edgesIgnoringSafeArea(.all)
             VStack(spacing: 30) {
                 VStack {
-                    Text("Tap the flag of").foregroundColor(.white)
-                    Text(countries[correctAnswer]).foregroundColor(.white)
+                    Text("Tap the flag of")
+                        .foregroundColor(.white)
+                    Text(countries[correctAnswer])
+                        .foregroundColor(.white)
                         .font(.largeTitle)
                         .fontWeight(.black)
                 }
@@ -31,17 +35,29 @@ struct ContentView: View {
                     Button(action: {
                         self.flagTapped(number)
                     }) {
-                        Image(self.countries[number]).renderingMode(.original)
+                        Image(self.countries[number])
+                            .renderingMode(.original)
                             .clipShape(Capsule())
                             .overlay(Capsule().stroke(Color.black, lineWidth: 1))
                             .shadow(color: .black, radius: 2)
                     }
                 }
                 
+                VStack {
+                    Text("Score:")
+                        .foregroundColor(.white)
+                        .font(.title)
+                    Text("\(currentScore)")
+                        .foregroundColor(.white)
+                        .font(.largeTitle)
+                        .fontWeight(.black)
+                }
+
                 Spacer()
+                
             }
         }.alert(isPresented: $showingScore) {
-            Alert(title: Text(scoreTitle), message: Text("Your score is ???"), dismissButton: Alert.Button.default(Text("Continue")) {
+            Alert(title: Text(scoreTitle), message: Text("Your score is \(currentScore)"), dismissButton: Alert.Button.default(Text("Continue")) {
                 self.askQuestion()
             })
         }
@@ -50,8 +66,14 @@ struct ContentView: View {
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
             scoreTitle = "Correct"
+            currentScore += 10
         } else {
             scoreTitle = "Wrong"
+            if currentScore - 5 < 0 {
+                currentScore = 0
+            } else {
+                currentScore -= 5
+            }
         }
         
         showingScore = true
